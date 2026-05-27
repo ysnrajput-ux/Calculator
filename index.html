@@ -5,7 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
 <meta name="theme-color" content="#050816">
-<title>Quantum AI Calculator</title>
+<title>YSN Quantum AI OS Calculator</title>
 <style>
 :root{
 --bg:#050816;
@@ -55,7 +55,13 @@ input,select,textarea{background:rgba(255,255,255,.08);border:none;color:#fff;pa
 .graph-canvas{width:100%;height:320px;border-radius:24px;background:#02030c}
 .matrix-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
 textarea{min-height:120px;resize:none}
-.fab{position:fixed;right:25px;bottom:25px;width:68px;height:68px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:grid;place-items:center;color:#000;font-size:32px;font-weight:900;cursor:pointer;box-shadow:0 0 40px rgba(0,245,255,.4);z-index:10}
+.fab{position:fixed;right:25px;bottom:25px;width:68px;height:68px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:grid;place-items:center;color:#000;font-size:32px;font-weight:900;cursor:pointer;box-shadow:0 0 40px rgba(0,245,255,.4);z-index:10;transition:.35s}.fab:hover{transform:scale(1.12) rotate(12deg)}
+.cursor-glow{position:fixed;width:240px;height:240px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,rgba(0,245,255,.18),transparent 70%);mix-blend-mode:screen;z-index:9999;transform:translate(-50%,-50%)}
+.command-palette{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.8);width:min(92vw,650px);padding:24px;opacity:0;pointer-events:none;transition:.3s;z-index:99999}.command-palette.active{opacity:1;pointer-events:auto;transform:translate(-50%,-50%) scale(1)}
+.command-item{padding:14px;border-radius:16px;background:rgba(255,255,255,.05);margin-top:10px;cursor:pointer}
+.live-status{position:fixed;top:12px;right:12px;padding:10px 18px;border-radius:999px;background:rgba(0,255,140,.12);border:1px solid rgba(0,255,140,.25);font-size:12px;backdrop-filter:blur(20px);z-index:9999}
+.ai-typing{display:inline-block;border-right:2px solid var(--accent);animation:blink 1s infinite}
+@keyframes blink{50%{border-color:transparent}}
 .loading{position:fixed;inset:0;background:#02030c;display:flex;align-items:center;justify-content:center;flex-direction:column;z-index:9999;transition:1s}
 .loader-ring{width:120px;height:120px;border-radius:50%;border:6px solid transparent;border-top-color:var(--accent);border-bottom-color:var(--accent2);animation:spin 1s linear infinite}
 .theme-list{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
@@ -72,11 +78,20 @@ textarea{min-height:120px;resize:none}
 <body>
 <div class='loading' id='loading'>
 <div class='loader-ring'></div>
-<h1 style='margin-top:20px'>Quantum AI Calculator</h1>
-<p>Initializing Neural Engine...</p>
+<h1 style='margin-top:20px'>YSN Quantum AI Calculator</h1>
+<p>Booting YSN Quantum Core...</p>
 </div>
 <canvas class='bg' id='bg'></canvas>
 <div class='aurora'></div>
+<div class='cursor-glow' id='cursorGlow'></div>
+<div class='live-status'>● YSN Quantum Core Online</div>
+<div class='command-palette glass' id='commandPalette'>
+<h2>YSN Command Center</h2>
+<input id='commandInput' placeholder='Type command like graph, matrix, finance...' style='margin-top:14px'>
+<div class='command-item' onclick="showTab('graph');toggleCommandPalette()">Open Graph Engine</div>
+<div class='command-item' onclick="showTab('matrix');toggleCommandPalette()">Open Matrix Lab</div>
+<div class='command-item' onclick="showTab('ai');toggleCommandPalette()">Open AI Agent</div>
+</div>
 <div id='app'>
 <aside class='sidebar'>
 <div class='logo'>YSN • QUANTUM AI</div>
@@ -207,7 +222,7 @@ textarea{min-height:120px;resize:none}
 <h2 style='margin-bottom:12px'>YSN Neural AI Agent</h2>
 <textarea id='aiInput' placeholder='Ask anything... Example: solve 25*8+99 , quadratic formula , matrix multiplication , graph sin wave'></textarea>
 <button class='small-btn' onclick='aiAssist()'>Analyze</button>
-<div id='aiOutput' class='card' style='margin-top:14px;white-space:pre-wrap'>Quantum AI Agent Ready...</div>
+<div id='aiOutput' class='card ai-typing' style='margin-top:14px;white-space:pre-wrap'>Quantum AI Agent Ready...</div>
 </div>
 <div id='notes' class='tab-content'>
 <textarea id='notesArea' placeholder='Write notes and formulas...'></textarea>
@@ -273,23 +288,18 @@ function scientific(t){let v=parseFloat(result.innerText||0);let r=v;
 if(t==='sin')r=Math.sin(v);if(t==='cos')r=Math.cos(v);if(t==='tan')r=Math.tan(v);if(t==='log')r=Math.log10(v);if(t==='ln')r=Math.log(v);if(t==='sqrt')r=Math.sqrt(v);if(t==='pow')r=v*v;if(t==='fact'){r=1;for(let i=2;i<=v;i++)r*=i}
 result.innerText=r;expr=''+r;addHistory(t+'('+v+') = '+r)}
 const g=document.getElementById('graphCanvas');const ctx=g.getContext('2d');
-function drawGraph(){g.width=g.offsetWidth;g.height=g.offsetHeight;ctx.clearRect(0,0,g.width,g.height);ctx.strokeStyle='#00f5ff';ctx.lineWidth=2;ctx.beginPath();let eq=document.getElementById('graphEq').value||'Math.sin(x)';for(let px=0;px<g.width;px++){let x=(px-g.width/2)/25;let y;try{y=eval(eq)}catch(e){y=0}let py=g.height/2-y*25;if(px===0)ctx.moveTo(px,py);else ctx.lineTo(px,py)}ctx.stroke()}
+function drawGraph(){g.width=g.offsetWidth;g.height=g.offsetHeight;ctx.clearRect(0,0,g.width,g.height);ctx.strokeStyle='rgba(255,255,255,.15)';for(let i=0;i<g.width;i+=40){ctx.beginPath();ctx.moveTo(i,0);ctx.lineTo(i,g.height);ctx.stroke()}for(let i=0;i<g.height;i+=40){ctx.beginPath();ctx.moveTo(0,i);ctx.lineTo(g.width,i);ctx.stroke()}ctx.beginPath();ctx.strokeStyle='#00f5ff';ctx.lineWidth=3;let eq=document.getElementById('graphEq').value||'Math.sin(x)';for(let px=0;px<g.width;px++){let x=(px-g.width/2)/32;let y=0;try{if(!/^[0-9x+\-*/(). Mathsincotaqruedp]+$/i.test(eq))throw 'unsafe';y=Function('x','return '+eq)(x)}catch(e){y=0}let py=g.height/2-y*32;if(px===0)ctx.moveTo(px,py);else ctx.lineTo(px,py)}ctx.shadowColor='#00f5ff';ctx.shadowBlur=20;ctx.stroke()}
 function programmerUpdate(){let n=parseInt(progInput.value||0);binOut.innerText=n.toString(2);hexOut.innerText=n.toString(16).toUpperCase();octOut.innerText=n.toString(8);notOut.innerText=(~n)}
 progInput.oninput=programmerUpdate;
 function parseMatrix(t){return t.trim().split('\n').map(r=>r.trim().split(' ').map(Number))}
-function matrixOp(type){try{let a=parseMatrix(m1.value),b=parseMatrix(m2.value),r=[];const rowsA=a.length,colsA=a[0].length,rowsB=b.length,colsB=b[0].length;if(type==='add'){if(rowsA!==rowsB||colsA!==colsB)throw 'Matrix size mismatch';r=a.map((row,i)=>row.map((v,j)=>v+b[i][j]))}if(type==='sub'){if(rowsA!==rowsB||colsA!==colsB)throw 'Matrix size mismatch';r=a.map((row,i)=>row.map((v,j)=>v-b[i][j]))}if(type==='transpose'){r=a[0].map((_,i)=>a.map(row=>row[i]))}if(type==='mul'){if(colsA!==rowsB)throw 'Invalid dimensions';r=Array.from({length:rowsA},()=>Array(colsB).fill(0));for(let i=0;i<rowsA;i++){for(let j=0;j<colsB;j++){for(let k=0;k<colsA;k++){r[i][j]+=a[i][k]*b[k][j]}}}}matrixResult.value=r.map(x=>x.join('  ')).join('
-');addHistory('Matrix '+type+' completed')}catch(e){matrixResult.value='Error: '+e}}
+function matrixOp(type){try{let a=parseMatrix(m1.value),b=parseMatrix(m2.value),r=[];const rowsA=a.length,colsA=a[0].length,rowsB=b.length,colsB=b[0].length;if(type==='add'){if(rowsA!==rowsB||colsA!==colsB)throw 'Matrix size mismatch';r=a.map((row,i)=>row.map((v,j)=>v+b[i][j]))}if(type==='sub'){if(rowsA!==rowsB||colsA!==colsB)throw 'Matrix size mismatch';r=a.map((row,i)=>row.map((v,j)=>v-b[i][j]))}if(type==='transpose'){r=a[0].map((_,i)=>a.map(row=>row[i]))}if(type==='mul'){if(colsA!==rowsB)throw 'Invalid dimensions';r=Array.from({length:rowsA},()=>Array(colsB).fill(0));for(let i=0;i<rowsA;i++){for(let j=0;j<colsB;j++){for(let k=0;k<colsA;k++){r[i][j]+=a[i][k]*b[k][j]}}}}matrixResult.value=r.map(x=>x.join('  ')).join('\n');addHistory('Matrix '+type+' completed')}catch(e){matrixResult.value='Error: '+e}}
 function solveQuadratic(){let a=+qa.value,b=+qb.value,c=+qc.value,d=b*b-4*a*c;eqResult.innerHTML=d<0?'No real roots':'x1=' + ((-b+Math.sqrt(d))/(2*a)) + '<br>x2=' + ((-b-Math.sqrt(d))/(2*a))}
 function convertUnits(){let t=convType.value,v=+convValue.value;if(t==='Length')convResult.innerText=(v*3.28084).toFixed(2)+' ft';if(t==='Weight')convResult.innerText=(v*2.20462).toFixed(2)+' lbs';if(t==='Temperature')convResult.innerText=((v*9/5)+32).toFixed(2)+' °F'}
 function calcAge(){let d=new Date(birth.value);let age=new Date().getFullYear()-d.getFullYear();ageResult.innerText=age+' years'}
 setInterval(()=>clock.innerText=new Date().toLocaleTimeString(),1000)
 function calcEMI(){let p=+loan.value,r=+rate.value/1200,n=+months.value;let emi=(p*r*Math.pow(1+r,n))/(Math.pow(1+r,n)-1);emiResult.innerText='₹ '+emi.toFixed(2)}
 function calcBMI(){let w=+weight.value,h=+height.value/100;let bmi=w/(h*h);bmiResult.innerText='BMI '+bmi.toFixed(1)}
-function aiAssist(){let raw=aiInput.value.trim();let t=raw.toLowerCase();let out='';try{if(/solve|calculate|eval/.test(t)){let exp=raw.replace(/solve|calculate|eval/gi,'').trim();if(/^[0-9+\-*/().% ]+$/.test(exp)){out='AI Solver Result: '+safeEval(exp)}}else if(t.includes('quadratic')){out='Quadratic Formula: x = (-b ± √(b²-4ac))/2a'}else if(t.includes('matrix')){out='AI Matrix Tips: Use equal dimensions for add/subtract and columns of A = rows of B for multiplication.'}else if(t.includes('graph')){out='Graph AI: Try Math.sin(x), x*x, Math.cos(x)*x'}else if(t.includes('loan')){out='Finance AI: Lower interest and shorter duration reduces total payable amount.'}else if(t.includes('bmi')){out='Health AI: BMI between 18.5 and 24.9 is considered healthy.'}else if(t.includes('code')){out='AI Agent: Syntax validated successfully.'}else{let suggestions=[];if(/[+\-*/]/.test(raw))suggestions.push('Expression detected');if(raw.includes('sin'))suggestions.push('Scientific function recognized');if(raw.length>20)suggestions.push('Complex input optimized');out='AI Neural Analysis:
-• '+suggestions.join('
-• ')+'
-• Auto-correction enabled
-• Syntax prediction active'}aiOutput.innerText=out||'AI Engine Ready';speechSynthesis.speak(new SpeechSynthesisUtterance(out||'AI ready'));}catch(e){aiOutput.innerText='AI detected invalid syntax and prevented crash safely.'}}
+function aiAssist(){let raw=aiInput.value.trim();let t=raw.toLowerCase();let out='';try{if(/solve|calculate|eval/.test(t)){let exp=raw.replace(/solve|calculate|eval/gi,'').trim();if(/^[0-9+\-*/().% ]+$/.test(exp)){out='AI Solver Result: '+safeEval(exp)}}else if(t.includes('quadratic')){out='Quadratic Formula: x = (-b ± √(b²-4ac))/2a'}else if(t.includes('matrix')){out='AI Matrix Tips: Use equal dimensions for add/subtract and columns of A = rows of B for multiplication.'}else if(t.includes('graph')){out='Graph AI: Try Math.sin(x), x*x, Math.cos(x)*x'}else if(t.includes('loan')){out='Finance AI: Lower interest and shorter duration reduces total payable amount.'}else if(t.includes('bmi')){out='Health AI: BMI between 18.5 and 24.9 is considered healthy.'}else if(t.includes('code')){out='AI Agent: Syntax validated successfully.'}else{let suggestions=[];if(/[+\-*/]/.test(raw))suggestions.push('Expression detected');if(raw.includes('sin'))suggestions.push('Scientific function recognized');if(raw.length>20)suggestions.push('Complex input optimized');out='AI Neural Analysis:\n• '+suggestions.join('\n• ')+'\n• Auto-correction enabled\n• Syntax prediction active'}aiOutput.innerText=out||'AI Engine Ready';speechSynthesis.speak(new SpeechSynthesisUtterance(out||'AI ready'));}catch(e){aiOutput.innerText='AI detected invalid syntax and prevented crash safely.'}}
 function saveNotes(){localStorage.notes=notesArea.value}
 notesArea.value=localStorage.notes||'';
 function applyTheme(t){
@@ -307,13 +317,15 @@ function speakResult(){speechSynthesis.speak(new SpeechSynthesisUtterance(result
 function startVoice(){let SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR)return alert('Speech unsupported');let rec=new SR();rec.onresult=e=>{expr=e.results[0][0].transcript.replace(/plus/g,'+').replace(/minus/g,'-');updateDisplay();calculate()};rec.start()}
 function copyResult(){navigator.clipboard.writeText(result.innerText)}
 function exportHistory(){let blob=new Blob([localStorage.history||'[]'],{type:'application/json'});let a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='history.json';a.click()}
-function toggleFullscreen(){if(!document.fullscreenElement)document.documentElement.requestFullscreen();else document.exitFullscreen()}
+function toggleFullscreen(){if(!document.fullscreenElement){document.documentElement.requestFullscreen().catch(()=>{});}else{document.exitFullscreen();}}
 function vibrate(){navigator.vibrate&&navigator.vibrate(10)}
-window.addEventListener('keydown',e=>{if('0123456789+-*/.%()'.includes(e.key))appendCalc(e.key);if(e.key==='Enter')calculate();if(e.key==='Backspace')backspace()})
-setTimeout(()=>loading.style.opacity='0',2200);setTimeout(()=>loading.remove(),3400)
+window.addEventListener('keydown',e=>{if('0123456789+-*/.%()'.includes(e.key))appendCalc(e.key);if(e.key==='Enter')calculate();if(e.key==='Backspace')backspace();if(e.ctrlKey&&e.key.toLowerCase()==='k'){e.preventDefault();toggleCommandPalette()}})
+function toggleCommandPalette(){commandPalette.classList.toggle('active');if(commandPalette.classList.contains('active'))commandInput.focus()}
+setTimeout(()=>loading.style.opacity='0',500);setTimeout(()=>loading.remove(),900)
 const bg=document.getElementById('bg');const bctx=bg.getContext('2d');let particles=[];function resize(){bg.width=innerWidth;bg.height=innerHeight}resize();window.onresize=resize;
 for(let i=0;i<120;i++)particles.push({x:Math.random()*innerWidth,y:Math.random()*innerHeight,r:Math.random()*2+1,v:Math.random()*1+0.3})
-function animate(){bctx.clearRect(0,0,bg.width,bg.height);particles.forEach(p=>{p.y+=p.v;if(p.y>innerHeight)p.y=0;bctx.beginPath();bctx.fillStyle='rgba(0,245,255,.7)';bctx.arc(p.x,p.y,p.r,0,Math.PI*2);bctx.fill()});requestAnimationFrame(animate)}animate();
+function animate(){bctx.clearRect(0,0,bg.width,bg.height);particles.forEach(p=>{p.y+=p.v;p.x+=Math.sin(p.y*.01)*.2;if(p.y>innerHeight)p.y=0;bctx.beginPath();bctx.fillStyle='rgba(0,245,255,.7)';bctx.arc(p.x,p.y,p.r,0,Math.PI*2);bctx.fill()});requestAnimationFrame(animate)}animate();
+document.addEventListener('mousemove',e=>{cursorGlow.style.left=e.clientX+'px';cursorGlow.style.top=e.clientY+'px'})
 let matrixMode=false;function toggleMatrixRain(){matrixMode=!matrixMode;if(matrixMode)matrixRain();}
 function matrixRain(){if(!matrixMode)return;let chars='01アイウエオカキクケコ';bctx.fillStyle='rgba(0,0,0,.08)';bctx.fillRect(0,0,bg.width,bg.height);for(let i=0;i<120;i++){bctx.fillStyle='#0f0';bctx.fillText(chars[Math.floor(Math.random()*chars.length)],Math.random()*bg.width,Math.random()*bg.height)}requestAnimationFrame(matrixRain)}
 if('serviceWorker' in navigator){

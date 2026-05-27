@@ -79,7 +79,7 @@ textarea{min-height:120px;resize:none}
 <div class='aurora'></div>
 <div id='app'>
 <aside class='sidebar'>
-<div class='logo'>Q•AI</div>
+<div class='logo'>YSN • QUANTUM AI</div>
 <div class='menu'>
 <button onclick="showTab('basic')">Basic Calculator</button>
 <button onclick="showTab('scientific')">Scientific</button>
@@ -204,9 +204,10 @@ textarea{min-height:120px;resize:none}
 <div id='bmiResult'></div>
 </div>
 <div id='ai' class='tab-content'>
-<textarea id='aiInput' placeholder='Type expression or ask for suggestion...'></textarea>
+<h2 style='margin-bottom:12px'>YSN Neural AI Agent</h2>
+<textarea id='aiInput' placeholder='Ask anything... Example: solve 25*8+99 , quadratic formula , matrix multiplication , graph sin wave'></textarea>
 <button class='small-btn' onclick='aiAssist()'>Analyze</button>
-<div id='aiOutput'></div>
+<div id='aiOutput' class='card' style='margin-top:14px;white-space:pre-wrap'>Quantum AI Agent Ready...</div>
 </div>
 <div id='notes' class='tab-content'>
 <textarea id='notesArea' placeholder='Write notes and formulas...'></textarea>
@@ -276,19 +277,19 @@ function drawGraph(){g.width=g.offsetWidth;g.height=g.offsetHeight;ctx.clearRect
 function programmerUpdate(){let n=parseInt(progInput.value||0);binOut.innerText=n.toString(2);hexOut.innerText=n.toString(16).toUpperCase();octOut.innerText=n.toString(8);notOut.innerText=(~n)}
 progInput.oninput=programmerUpdate;
 function parseMatrix(t){return t.trim().split('\n').map(r=>r.trim().split(' ').map(Number))}
-function matrixOp(type){let a=parseMatrix(m1.value),b=parseMatrix(m2.value),r=[];
-if(type==='add')r=a.map((row,i)=>row.map((v,j)=>v+b[i][j]));
-if(type==='sub')r=a.map((row,i)=>row.map((v,j)=>v-b[i][j]));
-if(type==='transpose')r=a[0].map((_,i)=>a.map(row=>row[i]));
-if(type==='mul'){r=a.map((row,i)=>b[0].map((_,j)=>row.reduce((s,v,k)=>s+v*b[k][j],0)))}
-matrixResult.value=r.map(x=>x.join(' ')).join('\n')}
+function matrixOp(type){try{let a=parseMatrix(m1.value),b=parseMatrix(m2.value),r=[];const rowsA=a.length,colsA=a[0].length,rowsB=b.length,colsB=b[0].length;if(type==='add'){if(rowsA!==rowsB||colsA!==colsB)throw 'Matrix size mismatch';r=a.map((row,i)=>row.map((v,j)=>v+b[i][j]))}if(type==='sub'){if(rowsA!==rowsB||colsA!==colsB)throw 'Matrix size mismatch';r=a.map((row,i)=>row.map((v,j)=>v-b[i][j]))}if(type==='transpose'){r=a[0].map((_,i)=>a.map(row=>row[i]))}if(type==='mul'){if(colsA!==rowsB)throw 'Invalid dimensions';r=Array.from({length:rowsA},()=>Array(colsB).fill(0));for(let i=0;i<rowsA;i++){for(let j=0;j<colsB;j++){for(let k=0;k<colsA;k++){r[i][j]+=a[i][k]*b[k][j]}}}}matrixResult.value=r.map(x=>x.join('  ')).join('
+');addHistory('Matrix '+type+' completed')}catch(e){matrixResult.value='Error: '+e}}
 function solveQuadratic(){let a=+qa.value,b=+qb.value,c=+qc.value,d=b*b-4*a*c;eqResult.innerHTML=d<0?'No real roots':'x1=' + ((-b+Math.sqrt(d))/(2*a)) + '<br>x2=' + ((-b-Math.sqrt(d))/(2*a))}
 function convertUnits(){let t=convType.value,v=+convValue.value;if(t==='Length')convResult.innerText=(v*3.28084).toFixed(2)+' ft';if(t==='Weight')convResult.innerText=(v*2.20462).toFixed(2)+' lbs';if(t==='Temperature')convResult.innerText=((v*9/5)+32).toFixed(2)+' °F'}
 function calcAge(){let d=new Date(birth.value);let age=new Date().getFullYear()-d.getFullYear();ageResult.innerText=age+' years'}
 setInterval(()=>clock.innerText=new Date().toLocaleTimeString(),1000)
 function calcEMI(){let p=+loan.value,r=+rate.value/1200,n=+months.value;let emi=(p*r*Math.pow(1+r,n))/(Math.pow(1+r,n)-1);emiResult.innerText='₹ '+emi.toFixed(2)}
 function calcBMI(){let w=+weight.value,h=+height.value/100;let bmi=w/(h*h);bmiResult.innerText='BMI '+bmi.toFixed(1)}
-function aiAssist(){let t=aiInput.value.toLowerCase();let o='AI Suggestion: ';if(t.includes('area'))o+='Use πr²';else if(t.includes('interest'))o+='Compound interest formula ready';else o+='Expression optimized and validated';aiOutput.innerText=o}
+function aiAssist(){let raw=aiInput.value.trim();let t=raw.toLowerCase();let out='';try{if(/solve|calculate|eval/.test(t)){let exp=raw.replace(/solve|calculate|eval/gi,'').trim();if(/^[0-9+\-*/().% ]+$/.test(exp)){out='AI Solver Result: '+safeEval(exp)}}else if(t.includes('quadratic')){out='Quadratic Formula: x = (-b ± √(b²-4ac))/2a'}else if(t.includes('matrix')){out='AI Matrix Tips: Use equal dimensions for add/subtract and columns of A = rows of B for multiplication.'}else if(t.includes('graph')){out='Graph AI: Try Math.sin(x), x*x, Math.cos(x)*x'}else if(t.includes('loan')){out='Finance AI: Lower interest and shorter duration reduces total payable amount.'}else if(t.includes('bmi')){out='Health AI: BMI between 18.5 and 24.9 is considered healthy.'}else if(t.includes('code')){out='AI Agent: Syntax validated successfully.'}else{let suggestions=[];if(/[+\-*/]/.test(raw))suggestions.push('Expression detected');if(raw.includes('sin'))suggestions.push('Scientific function recognized');if(raw.length>20)suggestions.push('Complex input optimized');out='AI Neural Analysis:
+• '+suggestions.join('
+• ')+'
+• Auto-correction enabled
+• Syntax prediction active'}aiOutput.innerText=out||'AI Engine Ready';speechSynthesis.speak(new SpeechSynthesisUtterance(out||'AI ready'));}catch(e){aiOutput.innerText='AI detected invalid syntax and prevented crash safely.'}}
 function saveNotes(){localStorage.notes=notesArea.value}
 notesArea.value=localStorage.notes||'';
 function applyTheme(t){

@@ -82,8 +82,9 @@ body.cyber{--bg:#050816;--card:rgba(255,255,255,.05);--text:#fff;--accent:#00f5f
 <div class="app">
 <div class="bg"><div class="orb"></div><div class="orb"></div></div>
 <div class="topbar">
-<div class="logo"><span>YSN</span> ADVANCE CALCULATOR</div>
 <div class="icon-btn" onclick="toggleMenu()">☰</div>
+<div class="logo" style="flex:1;text-align:center"><span>YSN</span> ADVANCE CALCULATOR</div>
+<div class="icon-btn" onclick="toggleDots()">⋮</div>
 </div>
 <div class="screen">
 <div class="page active" id="calcPage">
@@ -166,7 +167,7 @@ body.cyber{--bg:#050816;--card:rgba(255,255,255,.05);--text:#fff;--accent:#00f5f
 </div>
 </div>
 </div>
-<div class="fab" onclick="startVoice()">🎤</div>
+<div class="fab" onclick="startVoice()" style="bottom:120px;right:18px;width:58px;height:58px;border-radius:20px;font-size:24px">🎤</div>
 <div class="bottom-nav glass">
 <div class="nav-item active" onclick="showPage('calcPage',this)"><div class="nav-dot">⌘</div>Calc</div>
 <div class="nav-item" onclick="showPage('historyPage',this)"><div class="nav-dot">⏱</div>History</div>
@@ -176,6 +177,14 @@ body.cyber{--bg:#050816;--card:rgba(255,255,255,.05);--text:#fff;--accent:#00f5f
 </div>
 </div>
 <div class="sheet" id="menuSheet">
+<div class='handle'></div>
+<div class='section-title'>Navigation</div>
+<div class='menu-grid'>
+<div class='menu-btn' onclick="showPage('calcPage',document.querySelectorAll('.nav-item')[0]);toggleMenu()">Home</div>
+<div class='menu-btn' onclick="showPage('historyPage',document.querySelectorAll('.nav-item')[1]);toggleMenu()">History</div>
+<div class='menu-btn' onclick="showPage('toolsPage',document.querySelectorAll('.nav-item')[2]);toggleMenu()">Tools</div>
+<div class='menu-btn' onclick="showPage('aiPage',document.querySelectorAll('.nav-item')[3]);toggleMenu()">AI</div>
+</div>
 <div class="handle"></div>
 <div class="section-title">Modes</div>
 <div class="menu-grid">
@@ -187,6 +196,37 @@ body.cyber{--bg:#050816;--card:rgba(255,255,255,.05);--text:#fff;--accent:#00f5f
 <div class="menu-btn" onclick="openTool('converter')">Converter</div>
 <div class="menu-btn" onclick="openTool('finance')">EMI</div>
 <div class="menu-btn" onclick="openTool('bmi')">BMI</div>
+</div>
+<div class="sheet" id="dotsSheet">
+<div class='handle'></div>
+<div class='section-title'>Calculator Modes</div>
+<div class='menu-grid'>
+<div class='menu-btn' onclick="switchMode('Basic Calculator');toggleDots()">Basic</div>
+<div class='menu-btn' onclick="switchMode('Scientific Calculator');toggleDots()">Scientific</div>
+<div class='menu-btn' onclick="openTool('graph');toggleDots()">Graph</div>
+<div class='menu-btn' onclick="openTool('matrix');toggleDots()">Matrix</div>
+<div class='menu-btn' onclick="openTool('programmer');toggleDots()">Programmer</div>
+<div class='menu-btn' onclick="openTool('converter');toggleDots()">Converter</div>
+<div class='menu-btn' onclick="openTool('finance');toggleDots()">Financial</div>
+<div class='menu-btn' onclick="openTool('bmi');toggleDots()">Health</div>
+</div>
+<div class='section-title'>Customization</div>
+<div class='menu-grid'>
+<div class='menu-btn' onclick="setTheme('dark')">Dark</div>
+<div class='menu-btn' onclick="setTheme('light')">Light</div>
+<div class='menu-btn' onclick="setTheme('amoled')">AMOLED</div>
+<div class='menu-btn' onclick="setTheme('neon')">Neon</div>
+<div class='menu-btn' onclick="setTheme('cyber')">Cyber</div>
+<div class='menu-btn' onclick="setTheme('glass')">Glass</div>
+</div>
+<div class='section-title'>Tools</div>
+<div class='menu-grid'>
+<div class='menu-btn' onclick="startVoice()">Voice Input</div>
+<div class='menu-btn' onclick="speechSynthesis.speak(new SpeechSynthesisUtterance(resultEl.innerText))">Speak Result</div>
+<div class='menu-btn' onclick="loadHistory()">History</div>
+<div class='menu-btn' onclick="localStorage.removeItem('ysnHistory');loadHistory()">Clear History</div>
+<div class='menu-btn' onclick="document.documentElement.requestFullscreen()">Fullscreen</div>
+<div class='menu-btn' onclick="alert('YSN ADVANCE CALCULATOR')">About</div>
 </div>
 </div>
 </div>
@@ -206,7 +246,8 @@ function saveHistory(t){let h=JSON.parse(localStorage.ysnHistory||'[]');h.unshif
 function loadHistory(){let h=JSON.parse(localStorage.ysnHistory||'[]');historyList.innerHTML=h.map(v=>`<div class='history-item'>${v}</div>`).join('')}
 loadHistory();
 function showPage(id,el){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));el.classList.add('active')}
-function toggleMenu(){menuSheet.classList.toggle('active')}
+function toggleMenu(){menuSheet.classList.toggle('active');dotsSheet.classList.remove('active')}
+function toggleDots(){dotsSheet.classList.toggle('active');menuSheet.classList.remove('active')}
 function switchMode(name){modeLabel.innerText=name;toggleMenu();if(name.includes('Scientific'))scientificPanel.style.display='block';else scientificPanel.style.display='none'}
 function openTool(type){showPage('toolsPage',document.querySelectorAll('.nav-item')[2]);toggleMenu();let html='';if(type==='matrix'){html=`<div class='section-title'>Matrix Calculator</div><textarea class='input' id='m1'>1 2\n3 4</textarea><textarea class='input' id='m2'>5 6\n7 8</textarea><div class='row'><button class='small-btn' onclick="matrix('add')">Add</button><button class='small-btn' onclick="matrix('mul')">Multiply</button></div><div class='ai-box' id='matrixOut'></div>`}
 if(type==='programmer'){html=`<div class='section-title'>Programmer</div><input class='input' id='progInput' type='number' placeholder='Decimal'><button class='small-btn' onclick='programmer()'>Convert</button><div class='ai-box' id='progOut'></div>`}

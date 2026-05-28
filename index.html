@@ -3,339 +3,236 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
-<meta name="theme-color" content="#050816">
-<title>YSN Quantum AI OS Calculator</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>YSN ADVANCE CALCULATOR</title>
+<meta name="theme-color" content="#0b1020">
 <style>
 :root{
---bg:#050816;
---bg2:#0f172a;
+--bg:#0b1020;
 --card:rgba(255,255,255,.08);
 --text:#fff;
---accent:#00f5ff;
---accent2:#ff00ff;
---shadow:0 0 30px rgba(0,245,255,.35);
+--accent:#00eaff;
+--accent2:#7a5cff;
+--shadow:0 10px 30px rgba(0,0,0,.35);
 --radius:28px;
 --blur:20px;
+--nav:#121a2f;
 }
-*{margin:0;padding:0;box-sizing:border-box;font-family:Inter,Segoe UI,sans-serif;user-select:none}
-body{background:radial-gradient(circle at top,#101f4d,#050816 60%);color:var(--text);overflow:hidden;height:100vh}
-canvas.bg{position:fixed;inset:0;z-index:-2}
-.aurora{position:fixed;inset:-20%;background:conic-gradient(from 90deg,#00f5ff33,#ff00ff22,#00ff8844,#00f5ff33);filter:blur(120px);animation:spin 18s linear infinite;z-index:-1}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;font-family:Inter,system-ui,sans-serif}
+body{background:linear-gradient(180deg,#0b1020,#131b31);color:var(--text);height:100vh;overflow:hidden}
+body.light{--bg:#f3f6ff;--card:rgba(255,255,255,.7);--text:#10131c;--accent:#4f46e5;--accent2:#06b6d4;--nav:#ffffff}
+body.amoled{--bg:#000;--card:rgba(255,255,255,.05);--text:#fff;--accent:#00ffae;--accent2:#00c3ff;--nav:#050505}
+body.neon{--bg:#120015;--card:rgba(255,255,255,.06);--text:#fff;--accent:#ff00ff;--accent2:#00eaff;--nav:#170020}
+body.glass{--bg:#0d1222;--card:rgba(255,255,255,.09);--text:#fff;--accent:#ffffff;--accent2:#86a8ff;--nav:#11192c}
+body.minimal{--bg:#eef2ff;--card:#fff;--text:#111;--accent:#111827;--accent2:#4f46e5;--nav:#fff}
+body.cyber{--bg:#050816;--card:rgba(255,255,255,.05);--text:#fff;--accent:#00f5ff;--accent2:#ff00ea;--nav:#09101f}
+.app{height:100vh;display:flex;flex-direction:column;position:relative;overflow:hidden}
+.bg{position:absolute;inset:0;overflow:hidden;z-index:-1}
+.orb{position:absolute;border-radius:50%;filter:blur(60px);opacity:.4;animation:float 12s infinite alternate}
+.orb:nth-child(1){width:220px;height:220px;background:var(--accent);top:-60px;left:-50px}
+.orb:nth-child(2){width:260px;height:260px;background:var(--accent2);bottom:-80px;right:-60px;animation-duration:16s}
+@keyframes float{to{transform:translateY(40px) translateX(20px)}}
+.topbar{height:72px;padding:18px 18px 0;display:flex;align-items:center;justify-content:space-between}
+.logo{font-weight:900;font-size:18px;letter-spacing:1px}
+.logo span{background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;color:transparent}
+.icon-btn{width:44px;height:44px;border-radius:16px;background:var(--card);backdrop-filter:blur(var(--blur));display:grid;place-items:center;border:1px solid rgba(255,255,255,.08);box-shadow:var(--shadow);cursor:pointer}
+.screen{flex:1;overflow:hidden;position:relative}
+.page{position:absolute;inset:0;padding:10px 16px 110px;overflow:auto;display:none}
+.page.active{display:block}
+.glass{background:var(--card);backdrop-filter:blur(var(--blur));border:1px solid rgba(255,255,255,.08);box-shadow:var(--shadow)}
+.display-card{padding:18px;border-radius:32px;margin-top:8px}
+.mode-label{font-size:13px;opacity:.7;margin-bottom:10px}
+.expression{font-size:20px;min-height:32px;opacity:.7;text-align:right;word-break:break-all}
+.result{font-size:54px;font-weight:900;text-align:right;margin-top:10px;word-break:break-all}
+.keypad{margin-top:16px;display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.key{height:74px;border-radius:24px;border:none;background:var(--card);color:var(--text);font-size:24px;font-weight:700;backdrop-filter:blur(18px);box-shadow:var(--shadow);cursor:pointer;transition:.18s}
+.key:active{transform:scale(.95)}
+.op{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff}
+.bottom-nav{position:absolute;left:12px;right:12px;bottom:12px;height:82px;border-radius:30px;background:var(--nav);display:flex;justify-content:space-around;align-items:center;backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.08);box-shadow:var(--shadow)}
+.nav-item{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:11px;opacity:.7;cursor:pointer}
+.nav-item.active{opacity:1;color:var(--accent)}
+.nav-dot{width:22px;height:22px;border-radius:8px;background:var(--card);display:grid;place-items:center;font-size:12px}
+.sheet{position:fixed;left:0;right:0;bottom:-100%;background:var(--nav);border-radius:34px 34px 0 0;padding:20px;transition:.35s;z-index:50;max-height:85vh;overflow:auto;border-top:1px solid rgba(255,255,255,.08)}
+.sheet.active{bottom:0}
+.handle{width:70px;height:6px;background:rgba(255,255,255,.2);border-radius:999px;margin:0 auto 18px}
+.menu-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.menu-btn{padding:18px;border-radius:22px;background:var(--card);border:1px solid rgba(255,255,255,.08);font-weight:700;cursor:pointer}
+.section-title{margin:10px 0 14px;font-size:18px;font-weight:800}
+.list{display:flex;flex-direction:column;gap:12px}
+.item{padding:16px;border-radius:22px;background:var(--card)}
+.input{width:100%;padding:16px;border-radius:18px;border:none;background:var(--card);color:var(--text);margin-top:12px;outline:none}
+.row{display:flex;gap:10px}
+.small-btn{padding:14px 18px;border:none;border-radius:18px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-weight:700;cursor:pointer;margin-top:12px}
+.theme-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.theme{padding:18px;border-radius:20px;background:var(--card);text-align:center;font-weight:800;cursor:pointer}
+.fab{position:absolute;right:20px;bottom:105px;width:64px;height:64px;border-radius:24px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:grid;place-items:center;font-size:28px;font-weight:900;box-shadow:0 10px 30px rgba(0,0,0,.45);cursor:pointer;z-index:9}
+.history-item{padding:16px;border-radius:18px;background:var(--card);margin-top:10px;word-break:break-all}
+.ai-box{padding:18px;border-radius:24px;background:var(--card);margin-top:12px;white-space:pre-wrap;line-height:1.5}
+.loading{position:fixed;inset:0;background:#050816;display:flex;align-items:center;justify-content:center;flex-direction:column;z-index:999;transition:.5s}
+.loader{width:90px;height:90px;border-radius:50%;border:5px solid rgba(255,255,255,.1);border-top-color:var(--accent);animation:spin 1s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-#app{display:grid;grid-template-columns:280px 1fr;height:100vh;backdrop-filter:blur(12px)}
-.sidebar{background:rgba(255,255,255,.05);border-right:1px solid rgba(255,255,255,.1);padding:20px;overflow:auto}
-.logo{font-size:28px;font-weight:900;letter-spacing:2px;background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;color:transparent;margin-bottom:20px}
-.menu button,.action-btn,.calc-grid button,.theme-chip,.small-btn{width:100%;padding:14px;border:none;border-radius:18px;background:rgba(255,255,255,.07);color:#fff;margin-bottom:12px;cursor:pointer;transition:.3s;position:relative;overflow:hidden}
-.menu button:hover,.calc-grid button:hover,.theme-chip:hover,.small-btn:hover{transform:translateY(-2px) scale(1.02);box-shadow:var(--shadow);background:rgba(255,255,255,.12)}
-.main{padding:20px;overflow:auto;display:flex;flex-direction:column;gap:18px}
-.topbar{display:flex;gap:14px;align-items:center;justify-content:space-between}
-.glass{background:var(--card);backdrop-filter:blur(var(--blur));border:1px solid rgba(255,255,255,.1);border-radius:var(--radius);box-shadow:var(--shadow)}
-.search{flex:1;padding:16px;border:none;border-radius:20px;background:rgba(255,255,255,.08);color:#fff;outline:none}
-.dashboard{display:grid;grid-template-columns:1.4fr .8fr;gap:20px;min-height:calc(100vh - 110px)}
-.panel{padding:20px;position:relative;overflow:hidden}
-.display{height:140px;border-radius:24px;background:rgba(0,0,0,.35);padding:20px;display:flex;flex-direction:column;justify-content:end;align-items:flex-end;overflow:auto}
-#expr{font-size:22px;opacity:.7}
-#result{font-size:48px;font-weight:800}
-.calc-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:20px}
-.calc-grid button{height:72px;font-size:22px;font-weight:700;background:rgba(255,255,255,.06)}
-.calc-grid .op{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#000}
-.section-title{font-size:18px;font-weight:700;margin-bottom:14px;display:flex;justify-content:space-between}
-.cards{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
-.card{padding:18px;border-radius:22px;background:rgba(255,255,255,.05);min-height:130px;position:relative;overflow:hidden}
-.card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,transparent,rgba(255,255,255,.05));pointer-events:none}
-.small{font-size:13px;opacity:.7}
-.big{font-size:28px;font-weight:800;margin-top:8px}
-.history{max-height:240px;overflow:auto;display:flex;flex-direction:column;gap:10px}
-.history-item{padding:12px;border-radius:14px;background:rgba(255,255,255,.05);cursor:pointer}
-.tab-content{display:none}
-.tab-content.active{display:block}
-.flex{display:flex;gap:12px;flex-wrap:wrap}
-input,select,textarea{background:rgba(255,255,255,.08);border:none;color:#fff;padding:12px;border-radius:14px;outline:none;width:100%}
-.graph-canvas{width:100%;height:320px;border-radius:24px;background:#02030c}
-.matrix-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
-textarea{min-height:120px;resize:none}
-.fab{position:fixed;right:25px;bottom:25px;width:68px;height:68px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:grid;place-items:center;color:#000;font-size:32px;font-weight:900;cursor:pointer;box-shadow:0 0 40px rgba(0,245,255,.4);z-index:10;transition:.35s}.fab:hover{transform:scale(1.12) rotate(12deg)}
-.cursor-glow{position:fixed;width:240px;height:240px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,rgba(0,245,255,.18),transparent 70%);mix-blend-mode:screen;z-index:9999;transform:translate(-50%,-50%)}
-.command-palette{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.8);width:min(92vw,650px);padding:24px;opacity:0;pointer-events:none;transition:.3s;z-index:99999}.command-palette.active{opacity:1;pointer-events:auto;transform:translate(-50%,-50%) scale(1)}
-.command-item{padding:14px;border-radius:16px;background:rgba(255,255,255,.05);margin-top:10px;cursor:pointer}
-.live-status{position:fixed;top:12px;right:12px;padding:10px 18px;border-radius:999px;background:rgba(0,255,140,.12);border:1px solid rgba(0,255,140,.25);font-size:12px;backdrop-filter:blur(20px);z-index:9999}
-.ai-typing{display:inline-block;border-right:2px solid var(--accent);animation:blink 1s infinite}
-@keyframes blink{50%{border-color:transparent}}
-.loading{position:fixed;inset:0;background:#02030c;display:flex;align-items:center;justify-content:center;flex-direction:column;z-index:9999;transition:1s}
-.loader-ring{width:120px;height:120px;border-radius:50%;border:6px solid transparent;border-top-color:var(--accent);border-bottom-color:var(--accent2);animation:spin 1s linear infinite}
-.theme-list{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
-.theme-chip{padding:12px;text-align:center}
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.stat{padding:14px;border-radius:18px;background:rgba(255,255,255,.05);text-align:center}
-.wave{position:absolute;inset:auto -50px -60px;height:120px;background:radial-gradient(circle,var(--accent2),transparent 70%);opacity:.2;filter:blur(30px)}
-::-webkit-scrollbar{width:6px;height:6px}
-::-webkit-scrollbar-thumb{background:var(--accent);border-radius:20px}
-@media(max-width:1100px){#app{grid-template-columns:1fr}.sidebar{display:none}.dashboard{grid-template-columns:1fr}.calc-grid{grid-template-columns:repeat(4,1fr)}}
-@media(max-width:700px){.cards,.stats{grid-template-columns:1fr}.calc-grid button{height:62px;font-size:18px}.display{height:120px}#result{font-size:36px}}
+::-webkit-scrollbar{display:none}
 </style>
 </head>
-<body>
-<div class='loading' id='loading'>
-<div class='loader-ring'></div>
-<h1 style='margin-top:20px'>YSN Quantum AI Calculator</h1>
-<p>Booting YSN Quantum Core...</p>
+<body class="cyber">
+<div class="loading" id="loading">
+<div class="loader"></div>
+<h2 style="margin-top:20px">YSN ADVANCE CALCULATOR</h2>
 </div>
-<canvas class='bg' id='bg'></canvas>
-<div class='aurora'></div>
-<div class='cursor-glow' id='cursorGlow'></div>
-<div class='live-status'>● YSN Quantum Core Online</div>
-<div class='command-palette glass' id='commandPalette'>
-<h2>YSN Command Center</h2>
-<input id='commandInput' placeholder='Type command like graph, matrix, finance...' style='margin-top:14px'>
-<div class='command-item' onclick="showTab('graph');toggleCommandPalette()">Open Graph Engine</div>
-<div class='command-item' onclick="showTab('matrix');toggleCommandPalette()">Open Matrix Lab</div>
-<div class='command-item' onclick="showTab('ai');toggleCommandPalette()">Open AI Agent</div>
+<div class="app">
+<div class="bg"><div class="orb"></div><div class="orb"></div></div>
+<div class="topbar">
+<div class="logo"><span>YSN</span> ADVANCE CALCULATOR</div>
+<div class="icon-btn" onclick="toggleMenu()">☰</div>
 </div>
-<div id='app'>
-<aside class='sidebar'>
-<div class='logo'>YSN • QUANTUM AI</div>
-<div class='menu'>
-<button onclick="showTab('basic')">Basic Calculator</button>
-<button onclick="showTab('scientific')">Scientific</button>
-<button onclick="showTab('graph')">Graphing</button>
-<button onclick="showTab('programmer')">Programmer</button>
-<button onclick="showTab('matrix')">Matrix</button>
-<button onclick="showTab('equation')">Equation Solver</button>
-<button onclick="showTab('converter')">Unit Converter</button>
-<button onclick="showTab('datetime')">Date & Time</button>
-<button onclick="showTab('finance')">Financial</button>
-<button onclick="showTab('health')">Health</button>
-<button onclick="showTab('ai')">AI Assistant</button>
-<button onclick="showTab('notes')">Notes</button>
-<button onclick="toggleMatrixRain()">Matrix FX</button>
+<div class="screen">
+<div class="page active" id="calcPage">
+<div class="display-card glass">
+<div class="mode-label" id="modeLabel">Basic Calculator</div>
+<div class="expression" id="expression"></div>
+<div class="result" id="result">0</div>
 </div>
-</aside>
-<main class='main'>
-<div class='topbar'>
-<input class='search glass' placeholder='Search calculations, formulas, history...' id='globalSearch'>
-<button class='small-btn glass' onclick='toggleTheme()'>Theme</button>
-<button class='small-btn glass' onclick='startVoice()'>🎤 Voice</button>
-<button class='small-btn glass' onclick='speakResult()'>🔊 Speak</button>
-<button class='small-btn glass' onclick='toggleFullscreen()'>⛶</button>
+<div class="keypad">
+<button class="key" onclick="clearCalc()">AC</button>
+<button class="key" onclick="backspace()">⌫</button>
+<button class="key op" onclick="append('%')">%</button>
+<button class="key op" onclick="append('/')">÷</button>
+<button class="key" onclick="append('7')">7</button>
+<button class="key" onclick="append('8')">8</button>
+<button class="key" onclick="append('9')">9</button>
+<button class="key op" onclick="append('*')">×</button>
+<button class="key" onclick="append('4')">4</button>
+<button class="key" onclick="append('5')">5</button>
+<button class="key" onclick="append('6')">6</button>
+<button class="key op" onclick="append('-')">−</button>
+<button class="key" onclick="append('1')">1</button>
+<button class="key" onclick="append('2')">2</button>
+<button class="key" onclick="append('3')">3</button>
+<button class="key op" onclick="append('+')">+</button>
+<button class="key" onclick="toggleScientific()">ƒx</button>
+<button class="key" onclick="append('0')">0</button>
+<button class="key" onclick="append('.')">.</button>
+<button class="key op" onclick="calculate()">=</button>
 </div>
-<div class='dashboard'>
-<section class='panel glass'>
-<div id='basic' class='tab-content active'>
-<div class='display'>
-<div id='expr'></div>
-<div id='result'>0</div>
-</div>
-<div class='calc-grid'>
-<button onclick='clearCalc()'>AC</button>
-<button onclick='memoryRecall()'>MR</button>
-<button onclick='memoryAdd()'>M+</button>
-<button onclick='appendCalc("(")'>(</button>
-<button onclick='appendCalc(")")'>)</button>
-<button onclick='appendCalc("7")'>7</button>
-<button onclick='appendCalc("8")'>8</button>
-<button onclick='appendCalc("9")'>9</button>
-<button class='op' onclick='appendCalc("/")'>÷</button>
-<button class='op' onclick='appendCalc("%")'>%</button>
-<button onclick='appendCalc("4")'>4</button>
-<button onclick='appendCalc("5")'>5</button>
-<button onclick='appendCalc("6")'>6</button>
-<button class='op' onclick='appendCalc("*")'>×</button>
-<button onclick='backspace()'>⌫</button>
-<button onclick='appendCalc("1")'>1</button>
-<button onclick='appendCalc("2")'>2</button>
-<button onclick='appendCalc("3")'>3</button>
-<button class='op' onclick='appendCalc("-")'>−</button>
-<button onclick='appendCalc(".")'>.</button>
-<button onclick='appendCalc("0")'>0</button>
-<button onclick='appendCalc("00")'>00</button>
-<button onclick='appendCalc("+")'>+</button>
-<button class='op' style='grid-column:span 2' onclick='calculate()'>=</button>
+<div id="scientificPanel" style="display:none;margin-top:16px">
+<div class="row" style="flex-wrap:wrap">
+<button class="small-btn" onclick="scientific('sin')">sin</button>
+<button class="small-btn" onclick="scientific('cos')">cos</button>
+<button class="small-btn" onclick="scientific('tan')">tan</button>
+<button class="small-btn" onclick="scientific('sqrt')">√</button>
+<button class="small-btn" onclick="scientific('log')">log</button>
+<button class="small-btn" onclick="append(Math.PI)">π</button>
 </div>
 </div>
-<div id='scientific' class='tab-content'>
-<div class='flex'>
-<button class='small-btn' onclick='scientific("sin")'>sin</button><button class='small-btn' onclick='scientific("cos")'>cos</button><button class='small-btn' onclick='scientific("tan")'>tan</button><button class='small-btn' onclick='scientific("log")'>log</button><button class='small-btn' onclick='scientific("ln")'>ln</button>
-<button class='small-btn' onclick='scientific("sqrt")'>√</button><button class='small-btn' onclick='scientific("pow")'>x²</button><button class='small-btn' onclick='scientific("fact")'>n!</button><button class='small-btn' onclick='appendCalc(Math.PI.toString())'>π</button><button class='small-btn' onclick='appendCalc(Math.E.toString())'>e</button>
+</div>
+<div class="page" id="historyPage">
+<div class="section-title">History</div>
+<div id="historyList"></div>
+</div>
+<div class="page" id="toolsPage">
+<div class="section-title">Quick Tools</div>
+<div class="menu-grid">
+<div class="menu-btn" onclick="openTool('matrix')">Matrix</div>
+<div class="menu-btn" onclick="openTool('graph')">Graph</div>
+<div class="menu-btn" onclick="openTool('programmer')">Programmer</div>
+<div class="menu-btn" onclick="openTool('converter')">Converter</div>
+<div class="menu-btn" onclick="openTool('finance')">EMI</div>
+<div class="menu-btn" onclick="openTool('bmi')">BMI</div>
+</div>
+<div id="toolContent"></div>
+</div>
+<div class="page" id="aiPage">
+<div class="section-title">YSN AI TOOLS</div>
+<input class="input" id="aiInput" placeholder="Ask AI or type expression">
+<button class="small-btn" onclick="runAI()">Analyze</button>
+<div class="ai-box" id="aiOutput">AI Ready...</div>
+</div>
+<div class="page" id="settingsPage">
+<div class="section-title">Themes</div>
+<div class="theme-grid">
+<div class="theme" onclick="setTheme('cyber')">Cyber</div>
+<div class="theme" onclick="setTheme('dark')">Dark</div>
+<div class="theme" onclick="setTheme('light')">Light</div>
+<div class="theme" onclick="setTheme('amoled')">AMOLED</div>
+<div class="theme" onclick="setTheme('neon')">Neon</div>
+<div class="theme" onclick="setTheme('glass')">Glass</div>
+<div class="theme" onclick="setTheme('minimal')">Minimal</div>
+</div>
+<div class="section-title">Preferences</div>
+<div class="list">
+<div class="item"><label><input type="checkbox" id="soundToggle"> Sound Effects</label></div>
+<div class="item"><label><input type="checkbox" id="vibrateToggle" checked> Vibration</label></div>
+<div class="item"><label><input type="checkbox" id="animationToggle" checked> Animations</label></div>
 </div>
 </div>
-<div id='graph' class='tab-content'>
-<input id='graphEq' placeholder='Example: Math.sin(x)*x'>
-<button class='small-btn' onclick='drawGraph()'>Plot Graph</button>
-<canvas id='graphCanvas' class='graph-canvas'></canvas>
 </div>
-<div id='programmer' class='tab-content'>
-<input id='progInput' type='number' placeholder='Enter decimal number'>
-<div class='cards'>
-<div class='card'><div>Binary</div><div class='big' id='binOut'></div></div>
-<div class='card'><div>Hex</div><div class='big' id='hexOut'></div></div>
-<div class='card'><div>Octal</div><div class='big' id='octOut'></div></div>
-<div class='card'><div>Bitwise NOT</div><div class='big' id='notOut'></div></div>
+<div class="fab" onclick="startVoice()">🎤</div>
+<div class="bottom-nav glass">
+<div class="nav-item active" onclick="showPage('calcPage',this)"><div class="nav-dot">⌘</div>Calc</div>
+<div class="nav-item" onclick="showPage('historyPage',this)"><div class="nav-dot">⏱</div>History</div>
+<div class="nav-item" onclick="showPage('toolsPage',this)"><div class="nav-dot">⚡</div>Tools</div>
+<div class="nav-item" onclick="showPage('aiPage',this)"><div class="nav-dot">◎</div>AI</div>
+<div class="nav-item" onclick="showPage('settingsPage',this)"><div class="nav-dot">⚙</div>Settings</div>
 </div>
 </div>
-<div id='matrix' class='tab-content'>
-<div class='matrix-grid'>
-<textarea id='m1'>1 2\n3 4</textarea>
-<textarea id='m2'>5 6\n7 8</textarea>
+<div class="sheet" id="menuSheet">
+<div class="handle"></div>
+<div class="section-title">Modes</div>
+<div class="menu-grid">
+<div class="menu-btn" onclick="switchMode('Basic Calculator')">Basic</div>
+<div class="menu-btn" onclick="switchMode('Scientific Calculator')">Scientific</div>
+<div class="menu-btn" onclick="openTool('matrix')">Matrix</div>
+<div class="menu-btn" onclick="openTool('graph')">Graph</div>
+<div class="menu-btn" onclick="openTool('programmer')">Programmer</div>
+<div class="menu-btn" onclick="openTool('converter')">Converter</div>
+<div class="menu-btn" onclick="openTool('finance')">EMI</div>
+<div class="menu-btn" onclick="openTool('bmi')">BMI</div>
 </div>
-<div class='flex'>
-<button class='small-btn' onclick='matrixOp("add")'>Add</button>
-<button class='small-btn' onclick='matrixOp("sub")'>Subtract</button>
-<button class='small-btn' onclick='matrixOp("mul")'>Multiply</button>
-<button class='small-btn' onclick='matrixOp("transpose")'>Transpose A</button>
 </div>
-<textarea id='matrixResult'></textarea>
 </div>
-<div id='equation' class='tab-content'>
-<input id='qa' placeholder='a'>
-<input id='qb' placeholder='b'>
-<input id='qc' placeholder='c'>
-<button class='small-btn' onclick='solveQuadratic()'>Solve Quadratic</button>
-<div id='eqResult'></div>
-</div>
-<div id='converter' class='tab-content'>
-<select id='convType'><option>Length</option><option>Weight</option><option>Temperature</option></select>
-<input id='convValue' placeholder='Value'>
-<button class='small-btn' onclick='convertUnits()'>Convert</button>
-<div id='convResult'></div>
-</div>
-<div id='datetime' class='tab-content'>
-<input type='date' id='birth'>
-<button class='small-btn' onclick='calcAge()'>Calculate Age</button>
-<div id='ageResult'></div>
-<div class='big' id='clock'></div>
-</div>
-<div id='finance' class='tab-content'>
-<input id='loan' placeholder='Loan Amount'>
-<input id='rate' placeholder='Interest %'>
-<input id='months' placeholder='Months'>
-<button class='small-btn' onclick='calcEMI()'>Calculate EMI</button>
-<div id='emiResult'></div>
-</div>
-<div id='health' class='tab-content'>
-<input id='weight' placeholder='Weight kg'>
-<input id='height' placeholder='Height cm'>
-<button class='small-btn' onclick='calcBMI()'>Calculate BMI</button>
-<div id='bmiResult'></div>
-</div>
-<div id='ai' class='tab-content'>
-<h2 style='margin-bottom:12px'>YSN Neural AI Agent</h2>
-<textarea id='aiInput' placeholder='Ask anything... Example: solve 25*8+99 , quadratic formula , matrix multiplication , graph sin wave'></textarea>
-<button class='small-btn' onclick='aiAssist()'>Analyze</button>
-<div id='aiOutput' class='card ai-typing' style='margin-top:14px;white-space:pre-wrap'>Quantum AI Agent Ready...</div>
-</div>
-<div id='notes' class='tab-content'>
-<textarea id='notesArea' placeholder='Write notes and formulas...'></textarea>
-<button class='small-btn' onclick='saveNotes()'>Save Notes</button>
-</div>
-</section>
-<section class='panel glass'>
-<div class='section-title'>AI Dashboard <span id='themeName'>Cyber Neon</span></div>
-<div class='stats'>
-<div class='stat'><div class='small'>Calculations</div><div class='big' id='calcCount'>0</div></div>
-<div class='stat'><div class='small'>Sessions</div><div class='big' id='sessionCount'>1</div></div>
-<div class='stat'><div class='small'>Accuracy</div><div class='big'>99%</div></div>
-</div>
-<div style='height:16px'></div>
-<div class='section-title'>Themes</div>
-<div class='theme-list'>
-<div class='theme-chip' onclick='applyTheme("cyber")'>Cyber</div>
-<div class='theme-chip' onclick='applyTheme("amoled")'>AMOLED</div>
-<div class='theme-chip' onclick='applyTheme("gold")'>Royal Gold</div>
-<div class='theme-chip' onclick='applyTheme("matrix")'>Matrix</div>
-<div class='theme-chip' onclick='applyTheme("light")'>Minimal</div>
-<div class='theme-chip' onclick='applyTheme("anime")'>Anime</div>
-</div>
-<div style='height:20px'></div>
-<div class='section-title'>History</div>
-<div class='history' id='history'></div>
-<div style='height:20px'></div>
-<div class='section-title'>Quick Tools</div>
-<div class='cards'>
-<div class='card'><div class='small'>Clipboard</div><div class='big' onclick='copyResult()'>Copy</div><div class='wave'></div></div>
-<div class='card'><div class='small'>Export</div><div class='big' onclick='exportHistory()'>JSON</div><div class='wave'></div></div>
-<div class='card'><div class='small'>Screenshot</div><div class='big' onclick='window.print()'>Print</div><div class='wave'></div></div>
-<div class='card'><div class='small'>Install</div><div class='big' id='installBtn'>PWA</div><div class='wave'></div></div>
-</div>
-</section>
-</div>
-</main>
-</div>
-<div class='fab' onclick='showTab("basic")'>⌘</div>
 <script>
-let expr='';
-let memory=0;
-let calcCounter=+localStorage.calcCounter||0;
-document.getElementById('calcCount').innerText=calcCounter;
-function showTab(id){document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));document.getElementById(id).classList.add('active');localStorage.lastTab=id}
-showTab(localStorage.lastTab||'basic');
-function appendCalc(v){expr+=v;updateDisplay();vibrate()}
-function updateDisplay(){exprEl.innerText=expr;result.innerText=expr||'0'}
-const exprEl=document.getElementById('expr');
-function clearCalc(){expr='';updateDisplay()}
-function backspace(){expr=expr.slice(0,-1);updateDisplay()}
-function safeEval(expression){
-if(!/^[0-9+\-*/%.() ]+$/.test(expression)) throw 'Invalid';
-return Function('return '+expression)()
-}
-function calculate(){try{let r=safeEval(expr);result.innerText=r;addHistory(expr+' = '+r);expr=''+r;calcCounter++;localStorage.calcCounter=calcCounter;document.getElementById('calcCount').innerText=calcCounter}catch(e){result.innerText='Error'}}
-function addHistory(t){let h=JSON.parse(localStorage.history||'[]');h.unshift(t);localStorage.history=JSON.stringify(h);renderHistory()}
-function renderHistory(){let h=JSON.parse(localStorage.history||'[]');history.innerHTML=h.map(x=>`<div class='history-item' onclick='expr=${JSON.stringify('${x}'.split('=')[0].trim())};updateDisplay()'>${x}</div>`).join('')}
-renderHistory();
-function memoryAdd(){memory=+result.innerText}
-function memoryRecall(){expr+=memory;updateDisplay()}
-function scientific(t){let v=parseFloat(result.innerText||0);let r=v;
-if(t==='sin')r=Math.sin(v);if(t==='cos')r=Math.cos(v);if(t==='tan')r=Math.tan(v);if(t==='log')r=Math.log10(v);if(t==='ln')r=Math.log(v);if(t==='sqrt')r=Math.sqrt(v);if(t==='pow')r=v*v;if(t==='fact'){r=1;for(let i=2;i<=v;i++)r*=i}
-result.innerText=r;expr=''+r;addHistory(t+'('+v+') = '+r)}
-const g=document.getElementById('graphCanvas');const ctx=g.getContext('2d');
-function drawGraph(){g.width=g.offsetWidth;g.height=g.offsetHeight;ctx.clearRect(0,0,g.width,g.height);ctx.strokeStyle='rgba(255,255,255,.15)';for(let i=0;i<g.width;i+=40){ctx.beginPath();ctx.moveTo(i,0);ctx.lineTo(i,g.height);ctx.stroke()}for(let i=0;i<g.height;i+=40){ctx.beginPath();ctx.moveTo(0,i);ctx.lineTo(g.width,i);ctx.stroke()}ctx.beginPath();ctx.strokeStyle='#00f5ff';ctx.lineWidth=3;let eq=document.getElementById('graphEq').value||'Math.sin(x)';for(let px=0;px<g.width;px++){let x=(px-g.width/2)/32;let y=0;try{if(!/^[0-9x+\-*/(). Mathsincotaqruedp]+$/i.test(eq))throw 'unsafe';y=Function('x','return '+eq)(x)}catch(e){y=0}let py=g.height/2-y*32;if(px===0)ctx.moveTo(px,py);else ctx.lineTo(px,py)}ctx.shadowColor='#00f5ff';ctx.shadowBlur=20;ctx.stroke()}
-function programmerUpdate(){let n=parseInt(progInput.value||0);binOut.innerText=n.toString(2);hexOut.innerText=n.toString(16).toUpperCase();octOut.innerText=n.toString(8);notOut.innerText=(~n)}
-progInput.oninput=programmerUpdate;
-function parseMatrix(t){return t.trim().split('\n').map(r=>r.trim().split(' ').map(Number))}
-function matrixOp(type){try{let a=parseMatrix(m1.value),b=parseMatrix(m2.value),r=[];const rowsA=a.length,colsA=a[0].length,rowsB=b.length,colsB=b[0].length;if(type==='add'){if(rowsA!==rowsB||colsA!==colsB)throw 'Matrix size mismatch';r=a.map((row,i)=>row.map((v,j)=>v+b[i][j]))}if(type==='sub'){if(rowsA!==rowsB||colsA!==colsB)throw 'Matrix size mismatch';r=a.map((row,i)=>row.map((v,j)=>v-b[i][j]))}if(type==='transpose'){r=a[0].map((_,i)=>a.map(row=>row[i]))}if(type==='mul'){if(colsA!==rowsB)throw 'Invalid dimensions';r=Array.from({length:rowsA},()=>Array(colsB).fill(0));for(let i=0;i<rowsA;i++){for(let j=0;j<colsB;j++){for(let k=0;k<colsA;k++){r[i][j]+=a[i][k]*b[k][j]}}}}matrixResult.value=r.map(x=>x.join('  ')).join('\n');addHistory('Matrix '+type+' completed')}catch(e){matrixResult.value='Error: '+e}}
-function solveQuadratic(){let a=+qa.value,b=+qb.value,c=+qc.value,d=b*b-4*a*c;eqResult.innerHTML=d<0?'No real roots':'x1=' + ((-b+Math.sqrt(d))/(2*a)) + '<br>x2=' + ((-b-Math.sqrt(d))/(2*a))}
-function convertUnits(){let t=convType.value,v=+convValue.value;if(t==='Length')convResult.innerText=(v*3.28084).toFixed(2)+' ft';if(t==='Weight')convResult.innerText=(v*2.20462).toFixed(2)+' lbs';if(t==='Temperature')convResult.innerText=((v*9/5)+32).toFixed(2)+' °F'}
-function calcAge(){let d=new Date(birth.value);let age=new Date().getFullYear()-d.getFullYear();ageResult.innerText=age+' years'}
-setInterval(()=>clock.innerText=new Date().toLocaleTimeString(),1000)
-function calcEMI(){let p=+loan.value,r=+rate.value/1200,n=+months.value;let emi=(p*r*Math.pow(1+r,n))/(Math.pow(1+r,n)-1);emiResult.innerText='₹ '+emi.toFixed(2)}
-function calcBMI(){let w=+weight.value,h=+height.value/100;let bmi=w/(h*h);bmiResult.innerText='BMI '+bmi.toFixed(1)}
-function aiAssist(){let raw=aiInput.value.trim();let t=raw.toLowerCase();let out='';try{if(/solve|calculate|eval/.test(t)){let exp=raw.replace(/solve|calculate|eval/gi,'').trim();if(/^[0-9+\-*/().% ]+$/.test(exp)){out='AI Solver Result: '+safeEval(exp)}}else if(t.includes('quadratic')){out='Quadratic Formula: x = (-b ± √(b²-4ac))/2a'}else if(t.includes('matrix')){out='AI Matrix Tips: Use equal dimensions for add/subtract and columns of A = rows of B for multiplication.'}else if(t.includes('graph')){out='Graph AI: Try Math.sin(x), x*x, Math.cos(x)*x'}else if(t.includes('loan')){out='Finance AI: Lower interest and shorter duration reduces total payable amount.'}else if(t.includes('bmi')){out='Health AI: BMI between 18.5 and 24.9 is considered healthy.'}else if(t.includes('code')){out='AI Agent: Syntax validated successfully.'}else{let suggestions=[];if(/[+\-*/]/.test(raw))suggestions.push('Expression detected');if(raw.includes('sin'))suggestions.push('Scientific function recognized');if(raw.length>20)suggestions.push('Complex input optimized');out='AI Neural Analysis:\n• '+suggestions.join('\n• ')+'\n• Auto-correction enabled\n• Syntax prediction active'}aiOutput.innerText=out||'AI Engine Ready';speechSynthesis.speak(new SpeechSynthesisUtterance(out||'AI ready'));}catch(e){aiOutput.innerText='AI detected invalid syntax and prevented crash safely.'}}
-function saveNotes(){localStorage.notes=notesArea.value}
-notesArea.value=localStorage.notes||'';
-function applyTheme(t){
-let root=document.documentElement;
-if(t==='cyber'){root.style.cssText='--bg:#050816;--card:rgba(255,255,255,.08);--accent:#00f5ff;--accent2:#ff00ff;--text:#fff'}
-if(t==='amoled'){root.style.cssText='--bg:#000;--card:rgba(255,255,255,.05);--accent:#00ff99;--accent2:#00ccff;--text:#fff'}
-if(t==='gold'){root.style.cssText='--bg:#1b1400;--card:rgba(255,215,0,.08);--accent:#ffd700;--accent2:#ff9d00;--text:#fff7d1'}
-if(t==='matrix'){root.style.cssText='--bg:#000;--card:rgba(0,255,0,.08);--accent:#00ff00;--accent2:#0aff99;--text:#ccffcc'}
-if(t==='light'){root.style.cssText='--bg:#eef2ff;--card:rgba(255,255,255,.7);--accent:#3b82f6;--accent2:#9333ea;--text:#111'}
-if(t==='anime'){root.style.cssText='--bg:#250025;--card:rgba(255,105,180,.08);--accent:#ff69b4;--accent2:#8a2be2;--text:#fff'}
-localStorage.theme=t;themeName.innerText=t.toUpperCase()}
-applyTheme(localStorage.theme||'cyber');
-function toggleTheme(){let themes=['cyber','amoled','gold','matrix','light','anime'];applyTheme(themes[Math.floor(Math.random()*themes.length)])}
-function speakResult(){speechSynthesis.speak(new SpeechSynthesisUtterance(result.innerText))}
-function startVoice(){let SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR)return alert('Speech unsupported');let rec=new SR();rec.onresult=e=>{expr=e.results[0][0].transcript.replace(/plus/g,'+').replace(/minus/g,'-');updateDisplay();calculate()};rec.start()}
-function copyResult(){navigator.clipboard.writeText(result.innerText)}
-function exportHistory(){let blob=new Blob([localStorage.history||'[]'],{type:'application/json'});let a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='history.json';a.click()}
-function toggleFullscreen(){if(!document.fullscreenElement){document.documentElement.requestFullscreen().catch(()=>{});}else{document.exitFullscreen();}}
-function vibrate(){navigator.vibrate&&navigator.vibrate(10)}
-window.addEventListener('keydown',e=>{if('0123456789+-*/.%()'.includes(e.key))appendCalc(e.key);if(e.key==='Enter')calculate();if(e.key==='Backspace')backspace();if(e.ctrlKey&&e.key.toLowerCase()==='k'){e.preventDefault();toggleCommandPalette()}})
-function toggleCommandPalette(){commandPalette.classList.toggle('active');if(commandPalette.classList.contains('active'))commandInput.focus()}
-setTimeout(()=>loading.style.opacity='0',500);setTimeout(()=>loading.remove(),900)
-const bg=document.getElementById('bg');const bctx=bg.getContext('2d');let particles=[];function resize(){bg.width=innerWidth;bg.height=innerHeight}resize();window.onresize=resize;
-for(let i=0;i<120;i++)particles.push({x:Math.random()*innerWidth,y:Math.random()*innerHeight,r:Math.random()*2+1,v:Math.random()*1+0.3})
-function animate(){bctx.clearRect(0,0,bg.width,bg.height);particles.forEach(p=>{p.y+=p.v;p.x+=Math.sin(p.y*.01)*.2;if(p.y>innerHeight)p.y=0;bctx.beginPath();bctx.fillStyle='rgba(0,245,255,.7)';bctx.arc(p.x,p.y,p.r,0,Math.PI*2);bctx.fill()});requestAnimationFrame(animate)}animate();
-document.addEventListener('mousemove',e=>{cursorGlow.style.left=e.clientX+'px';cursorGlow.style.top=e.clientY+'px'})
-let matrixMode=false;function toggleMatrixRain(){matrixMode=!matrixMode;if(matrixMode)matrixRain();}
-function matrixRain(){if(!matrixMode)return;let chars='01アイウエオカキクケコ';bctx.fillStyle='rgba(0,0,0,.08)';bctx.fillRect(0,0,bg.width,bg.height);for(let i=0;i<120;i++){bctx.fillStyle='#0f0';bctx.fillText(chars[Math.floor(Math.random()*chars.length)],Math.random()*bg.width,Math.random()*bg.height)}requestAnimationFrame(matrixRain)}
-if('serviceWorker' in navigator){
-const sw=`self.addEventListener('install',e=>self.skipWaiting());self.addEventListener('fetch',e=>e.respondWith(caches.open('qai').then(async c=>{let r=await c.match(e.request);return r||fetch(e.request).then(res=>{c.put(e.request,res.clone());return res})})))`;
-const blob=new Blob([sw],{type:'text/javascript'});
-navigator.serviceWorker.register(URL.createObjectURL(blob));}
-const manifest={name:'Quantum AI Calculator',short_name:'QAI',display:'standalone',background_color:'#050816',theme_color:'#050816',start_url:'./',icons:[{src:createIcon(),sizes:'192x192',type:'image/png'},{src:createIcon(),sizes:'512x512',type:'image/png'}]};
-const mblob=new Blob([JSON.stringify(manifest)],{type:'application/json'});const murl=URL.createObjectURL(mblob);let link=document.createElement('link');link.rel='manifest';link.href=murl;document.head.appendChild(link);
-function createIcon(){let c=document.createElement('canvas');c.width=512;c.height=512;let x=c.getContext('2d');x.fillStyle='#050816';x.fillRect(0,0,512,512);x.fillStyle='#00f5ff';x.font='bold 220px sans-serif';x.fillText('Q',140,320);return c.toDataURL()}
-let deferredPrompt;window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;installBtn.onclick=()=>deferredPrompt.prompt()});
+const expressionEl=document.getElementById('expression');
+const resultEl=document.getElementById('result');
+let expression='';
+function append(v){expression+=v;render();tap()}
+function render(){expressionEl.innerText=expression;resultEl.innerText=expression||'0'}
+function clearCalc(){expression='';render()}
+function backspace(){expression=expression.slice(0,-1);render()}
+function safeEval(exp){if(!/^[0-9+\-*/%.() ]+$/.test(exp))throw 'Invalid';return Function('return '+exp)()}
+function calculate(){try{const r=safeEval(expression);resultEl.innerText=r;saveHistory(expression+' = '+r);expression=''+r}catch(e){resultEl.innerText='Error'}}
+function scientific(type){let v=parseFloat(resultEl.innerText||0),r=v;if(type==='sin')r=Math.sin(v);if(type==='cos')r=Math.cos(v);if(type==='tan')r=Math.tan(v);if(type==='sqrt')r=Math.sqrt(v);if(type==='log')r=Math.log10(v);resultEl.innerText=r;expression=''+r;saveHistory(type+'('+v+') = '+r)}
+function toggleScientific(){scientificPanel.style.display=scientificPanel.style.display==='none'?'block':'none'}
+function saveHistory(t){let h=JSON.parse(localStorage.ysnHistory||'[]');h.unshift(t);localStorage.ysnHistory=JSON.stringify(h);loadHistory()}
+function loadHistory(){let h=JSON.parse(localStorage.ysnHistory||'[]');historyList.innerHTML=h.map(v=>`<div class='history-item'>${v}</div>`).join('')}
+loadHistory();
+function showPage(id,el){document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));el.classList.add('active')}
+function toggleMenu(){menuSheet.classList.toggle('active')}
+function switchMode(name){modeLabel.innerText=name;toggleMenu();if(name.includes('Scientific'))scientificPanel.style.display='block';else scientificPanel.style.display='none'}
+function openTool(type){showPage('toolsPage',document.querySelectorAll('.nav-item')[2]);toggleMenu();let html='';if(type==='matrix'){html=`<div class='section-title'>Matrix Calculator</div><textarea class='input' id='m1'>1 2\n3 4</textarea><textarea class='input' id='m2'>5 6\n7 8</textarea><div class='row'><button class='small-btn' onclick="matrix('add')">Add</button><button class='small-btn' onclick="matrix('mul')">Multiply</button></div><div class='ai-box' id='matrixOut'></div>`}
+if(type==='programmer'){html=`<div class='section-title'>Programmer</div><input class='input' id='progInput' type='number' placeholder='Decimal'><button class='small-btn' onclick='programmer()'>Convert</button><div class='ai-box' id='progOut'></div>`}
+if(type==='converter'){html=`<div class='section-title'>Unit Converter</div><input class='input' id='convVal' placeholder='Kilometers'><button class='small-btn' onclick='convert()'>Convert to Miles</button><div class='ai-box' id='convOut'></div>`}
+if(type==='finance'){html=`<div class='section-title'>EMI Calculator</div><input class='input' id='loan' placeholder='Loan'><input class='input' id='rate' placeholder='Rate'><input class='input' id='months' placeholder='Months'><button class='small-btn' onclick='emi()'>Calculate</button><div class='ai-box' id='emiOut'></div>`}
+if(type==='bmi'){html=`<div class='section-title'>BMI Calculator</div><input class='input' id='weight' placeholder='Weight kg'><input class='input' id='height' placeholder='Height cm'><button class='small-btn' onclick='bmi()'>Calculate</button><div class='ai-box' id='bmiOut'></div>`}
+if(type==='graph'){html=`<div class='section-title'>Graph</div><input class='input' id='eq' placeholder='Math.sin(x)'><canvas id='graph' width='320' height='240' style='width:100%;margin-top:12px;border-radius:24px;background:#02040b'></canvas><button class='small-btn' onclick='drawGraph()'>Draw</button>`}
+toolContent.innerHTML=html}
+function parseMatrix(t){return t.trim().split('\n').map(r=>r.trim().split(/\s+/).map(Number))}
+function matrix(type){let a=parseMatrix(m1.value),b=parseMatrix(m2.value),r=[];if(type==='add'){r=a.map((row,i)=>row.map((v,j)=>v+b[i][j]))}if(type==='mul'){r=a.map((row,i)=>b[0].map((_,j)=>row.reduce((s,v,k)=>s+v*b[k][j],0)))}matrixOut.innerText=r.map(v=>v.join(' ')).join('\n')}
+function programmer(){let n=parseInt(progInput.value||0);progOut.innerText=`Binary: ${n.toString(2)}\nHex: ${n.toString(16).toUpperCase()}\nOctal: ${n.toString(8)}`}
+function convert(){convOut.innerText=(convVal.value*0.621371).toFixed(2)+' Miles'}
+function emi(){let p=+loan.value,r=+rate.value/1200,n=+months.value;let e=(p*r*Math.pow(1+r,n))/(Math.pow(1+r,n)-1);emiOut.innerText='EMI: ₹'+e.toFixed(2)}
+function bmi(){let b=weight.value/((height.value/100)**2);bmiOut.innerText='BMI: '+b.toFixed(1)}
+function drawGraph(){let c=document.getElementById('graph'),x=c.getContext('2d');x.clearRect(0,0,c.width,c.height);x.strokeStyle='#00eaff';x.beginPath();let eq=document.getElementById('eq').value||'Math.sin(x)';for(let px=0;px<c.width;px++){let xv=(px-c.width/2)/25;let yv=Function('x','return '+eq)(xv);let py=c.height/2-yv*25;if(px===0)x.moveTo(px,py);else x.lineTo(px,py)}x.stroke()}
+function runAI(){let q=aiInput.value.toLowerCase();let out='YSN AI:\n';if(q.includes('loan'))out+='Use EMI tool for accurate finance calculations.';else if(q.includes('matrix'))out+='Matrix operations available in tools section.';else if(q.includes('graph'))out+='Graph engine supports Math.sin(x), x*x etc.';else if(/[+\-*/]/.test(q))out+='Expression detected. Use calculator keypad for solving.';else out+='Smart analysis complete. System optimized.';aiOutput.innerText=out;speechSynthesis.speak(new SpeechSynthesisUtterance(out))}
+function setTheme(t){document.body.className=t;localStorage.theme=t}
+setTheme(localStorage.theme||'cyber');
+function tap(){if(vibrateToggle.checked&&navigator.vibrate)navigator.vibrate(8)}
+function startVoice(){let SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR)return;let r=new SR();r.onresult=e=>{expression=e.results[0][0].transcript.replace(/plus/g,'+').replace(/minus/g,'-');render();calculate()};r.start()}
+window.addEventListener('keydown',e=>{if('0123456789+-*/.%()'.includes(e.key))append(e.key);if(e.key==='Enter')calculate();if(e.key==='Backspace')backspace()})
+setTimeout(()=>{loading.style.opacity='0';setTimeout(()=>loading.remove(),500)},700)
+if('serviceWorker' in navigator){const sw=`self.addEventListener('fetch',e=>e.respondWith(caches.open('ysn').then(async c=>{let r=await c.match(e.request);return r||fetch(e.request).then(res=>{c.put(e.request,res.clone());return res})})))`;navigator.serviceWorker.register(URL.createObjectURL(new Blob([sw],{type:'text/javascript'})))}
+function icon(){let c=document.createElement('canvas');c.width=512;c.height=512;let x=c.getContext('2d');x.fillStyle='#0b1020';x.fillRect(0,0,512,512);let g=x.createLinearGradient(0,0,512,512);g.addColorStop(0,'#00eaff');g.addColorStop(1,'#7a5cff');x.fillStyle=g;x.beginPath();x.roundRect(70,70,372,372,90);x.fill();x.fillStyle='#fff';x.font='bold 72px sans-serif';x.fillText('YSN',140,230);x.font='38px sans-serif';x.fillText('ADVANCE',110,300);x.fillText('CALCULATOR',85,360);return c.toDataURL()}
+const manifest={name:'YSN ADVANCE CALCULATOR',short_name:'YSN ADVANCE CALCULATOR',display:'standalone',background_color:'#0b1020',theme_color:'#0b1020',start_url:'./',icons:[{src:icon(),sizes:'192x192',type:'image/png'},{src:icon(),sizes:'512x512',type:'image/png'}]};
+let link=document.createElement('link');link.rel='manifest';link.href=URL.createObjectURL(new Blob([JSON.stringify(manifest)],{type:'application/json'}));document.head.appendChild(link);
 </script>
 </body>
 </html>
